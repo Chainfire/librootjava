@@ -266,8 +266,8 @@ public class RootJava {
      * Due to preparing the main looper, this throws off libsuperuser if you use it for shell
      * commands on the main thread. If you use this call, you will probably need to call
      * Debug.setSanityChecksEnabled(false) to get any shell calls executed, and create a
-     * separate HandlerThread (and Handler), and use both Shell.Builder::setAutoHandler(false)
-     * and Shell.Builder::setHandler(^^^^) for Shell.Interactive to behave as expected.
+     * separate HandlerThread (and Handler), and use both Shell.Builder.setAutoHandler(false)
+     * and Shell.Builder.setHandler(^^^^) for Shell.Interactive to behave as expected.
      *
      * @return System context
      */

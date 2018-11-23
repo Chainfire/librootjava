@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
 
                If you're done with the IPC interface at the end of this method, call disconnect().
                You shouldn't store the interface itself, but if you don't disconnect() you can call
-               RootIPCReceiver::getIPC() later.
+               RootIPCReceiver.getIPC() later.
             */
             Logger.dp("IPC", "onConnect");
             try {
@@ -279,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
             If this method was not running on the main thread, and you wanted to use the IPC class
             serially rather than using the onConnect callback, you could do it like this:
 
-            IPC ipc = ipcReceiver.getIPC(30 * 1000);
+            IIPC ipc = ipcReceiver.getIPC(30 * 1000);
             if (ipc != null) {
                 int remotePid = ipc.getPid();
                 // ...
