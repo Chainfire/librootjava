@@ -228,6 +228,8 @@ it:
 
 ```
 public class MyActivity {
+    // ... (you still need to start the root process somewhere)
+
     private final RootIPCReceiver<IMyIPC> ipcReceiver = new RootIPCReceiver<IMyIPC>(null, 0) {
         @Override
         public void onConnect(IMyIPC ipc) {
