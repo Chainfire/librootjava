@@ -99,7 +99,7 @@ On the non-root side, simply replace your calls to
 ```RootDaemon.getLaunchScript()```. Everything will work the same
 as with normal use of [libRootJava](../librootjava), aside from that
 the root process isn't tied to the lifecycle of the non-root end,
-and you might want to tell explicitly tell the daemon to terminate at
+and you might want to explicitly tell the daemon to terminate at
 some point (or not).
 
 See the [example project](../librootjavadaemon_example) for further
