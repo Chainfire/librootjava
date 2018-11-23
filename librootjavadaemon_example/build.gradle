@@ -1,0 +1,39 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion '28.0.3'
+
+    defaultConfig {
+        applicationId "eu.chainfire.librootjavadaemon_example"
+        minSdkVersion 21
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+
+    implementation 'eu.chainfire:libsuperuser:1.0.0.+'
+
+    /* Uncomment these lines and commment the other ones during development to use the local maven
+       repository version, installed by the installMavenLocal Gradle task */
+    //implementation('eu.chainfire:librootjava:1.0.0-SNAPSHOT') { changing = true }
+    //implementation('eu.chainfire:librootjavadaemon:1.0.0-SNAPSHOT') { changing = true }
+
+    implementation 'eu.chainfire:librootjava:1.0.0'
+    implementation 'eu.chainfire:librootjavadaemon:1.0.0'
+}

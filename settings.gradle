@@ -1,0 +1,1 @@
+include ':librootjava', ':librootjava_example', ':librootjavadaemon', ':librootjavadaemon_example'

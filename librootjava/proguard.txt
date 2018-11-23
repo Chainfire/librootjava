@@ -1,0 +1,7 @@
+-keepclassmembers class * {
+    public static void main(java.lang.String[]);
+}
+
+-keep class * implements android.os.IInterface {
+    *;
+}

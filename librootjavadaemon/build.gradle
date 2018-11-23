@@ -1,0 +1,152 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion '28.0.3'
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 26
+        consumerProguardFiles 'proguard.txt'
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
+}
+
+dependencies {
+    /* Uncomment this line and commment the other one during development to use the local maven
+       repository version, installed by the installMavenLocal Gradle task */
+    //implementation('eu.chainfire:librootjava:1.0.0-SNAPSHOT') { changing = true }
+
+    implementation 'eu.chainfire:librootjava:1.0.0'
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+ext {
+    libraryName = 'libRootJavaDaemon'
+    libraryDescription = 'Add-on for libRootJava to run the root process as a daemon'
+
+    publishedGroupId = 'eu.chainfire'
+    artifact = 'librootjavadaemon'
+
+    siteUrl = 'https://github.com/Chainfire/librootjava'
+    gitUrl = 'https://github.com/Chainfire/librootjava.git'
+    issueTrackerUrl = 'https://github.com/Chainfire/librootjava/issues'
+
+    libraryVersion = '1.0.0'
+
+    developerId = 'Chainfire'
+    developerName = 'Jorrit Jongma'
+    developerEmail = 'chainfire@chainfire.eu'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+
+    bintrayRepo = 'maven'
+    bintrayName = artifact
+}
+
+task installMavenLocal(type: Upload) {
+    repositories.mavenInstaller {
+        configuration = configurations['archives']
+        pom.project {
+            packaging 'aar'
+            groupId = publishedGroupId
+            artifactId = artifact
+            version = '1.0.0-SNAPSHOT'
+        }
+    }
+}
+
+// Workaround bintray bug ignoring these from pom and bintray settings
+version = libraryVersion
+group = publishedGroupId
+
+bintray {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    user = properties.getProperty('bintray.user')
+    key = properties.getProperty('bintray.apikey')
+
+    configurations = ['archives']
+    dryRun = false
+    publish = true
+    pkg {
+        repo = bintrayRepo
+        name = libraryName
+        desc = libraryDescription
+        websiteUrl = siteUrl
+        issueTrackerUrl = issueTrackerUrl   // doesn't actually work?
+        vcsUrl = gitUrl
+        //githubRepo = gitUrl               // some more bintray weirdness here, breaks upload
+        //githubReleaseNotesFile = 'README.md'
+        licenses = allLicenses
+        publicDownloadNumbers = true
+        version {
+            name = libraryVersion
+            released = new Date()
+        }
+    }
+}
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            packaging 'aar'
+            groupId = publishedGroupId
+            artifactId = artifact
+            name libraryName
+            version = libraryVersion
+            url siteUrl
+            licenses {
+                license {
+                    name licenseName
+                    url licenseUrl
+                }
+            }
+            developers {
+                developer {
+                    id developerId
+                    name developerName
+                    email developerEmail
+                }
+            }
+            scm {
+                connection gitUrl
+                developerConnection gitUrl
+                url gitUrl
+            }
+        }
+    }
+}
+
+bintrayUpload.dependsOn install
