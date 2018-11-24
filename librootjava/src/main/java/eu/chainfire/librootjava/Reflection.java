@@ -74,7 +74,9 @@ class Reflection {
     @SuppressWarnings({"JavaReflectionMemberAccess"})
     private static Object getActivityManager() {
         // We could possibly cast this to ActivityManager instead of Object, but we don't currently
-        // need that for our usage, and it would require retesting everything
+        // need that for our usage, and it would require retesting everything. Maybe ActivityManager
+        // is even wrong and it should be ActivityManagerService, for which we don't have the class
+        // definition anyway. TODO: investigate further.
 
         synchronized (lock) {
             if (oActivityManager != null) {
