@@ -308,6 +308,43 @@ If for some reason Gradle does not pick up these rules automatically,
 copy/paste them from the ```proguard.txt``` file into your own ProGuard
 ruleset.
 
+## Restrictions on non-SDK interfaces
+
+Android 9.0 (Pie, API 28) introduces restrictions on the use of non-SDK
+interfaces, whether directly, via reflection, or via JNI. See [this page
+on the Android site](https://developer.android.com/about/versions/pie/restrictions-non-sdk-interfaces)
+for details.
+
+We do use non-SDK interfaces in the part of the code that runs as root,
+and currently it seems this is exempt from the restrictions. My
+preliminary interpretation of the relevant sources in AOSP is that
+this only applies to code running in a process spawned from Zygote,
+which our code running as root isn't.
+
+It appears to currently (November 2018) be implemented as runtime
+checks only. It may create some problems if these checks in the future
+are also done at the ahead-of-time (AOT) compilation stage at app
+install. There is currently no indication if that is or isn't likely to
+happen (but if it does I expect the runtime checks to remain as well).
+
+In my experiments so far, if API 28 is targeted and you use a non-SDK
+call in a normal app, a warning is written to the logs. If you go one
+step further and enable strict-mode, a full stack-trace is logged:
+
+```
+StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+    .detectNonSdkApiUsage()
+    .build());
+}
+```
+
+However, making a non-SDK call from the code running as root doesn't
+seem to trigger anything, either with or without explicitly enabling
+strict mode. So it appears for now we are safe.
+
+TODO: This needs further investigation and monitoring, especially when
+an Android 10 preview comes out!
+
 ## Gradle
 
 ```
