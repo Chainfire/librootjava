@@ -6,6 +6,7 @@ Run Java (and Kotlin) code as root!
 - Access to all the classes in your projects
 - Access to Android classes
 - Easy Binder-based IPC/RPC
+- Debugging support
 
 ## License
 
@@ -68,14 +69,6 @@ many devices and Android versions. Apps such as *LiveBoot*,
 While this library was originally built to support Android 4.2+ devices,
 it only officially supports 5.0+. The first public GitHub release was
 tested specifically on 5.0, 7.0, 8.0, and 9.0.
-
-## Debugging
-
-Debugging the code running as root is currently not supported. I made
-some headway getting the jdwp server running, but I've not been able
-to successfully connect jdb or AndroidStudio to it. If you want to take
-a stab at it, there are some comments in
-```RootJava.getLaunchString()``` related to it.
 
 ## Recommended reading
 
@@ -270,6 +263,84 @@ non-root code.
 (See the [example project](../librootjava_example) for a more elaborate
 example for this entire process)
 
+#### Debugging
+
+Debugging is supported since version 1.1.0, but disabled by default.
+
+To enable debugging, first we must tell the non-root process to launch
+our root process with debug support enabled. We do this by calling
+```Debugger.setEnabled()``` *before* calling
+```RootJava.getLaunchScript()```:
+
+```
+public class MyActivity {
+    // ...
+    private void launchRootProcess() {
+        // ...
+
+        Debugger.setEnabled(BuildConfig.DEBUG);
+        rootShell.addCommand(RootJava.getLaunchScript(this, RootMain.class, null, null, null, BuildConfig.APPLICATION_ID + ":root"));
+    }
+}
+```
+
+We use ```BuildConfig.DEBUG``` instead of ```true``` to prevent
+potential issues with release builds.
+
+In the code running as root, we then call ```Debugger.waitFor()```
+to pause execution (of the current thread) until a debugger is connected:
+
+```
+public class RootMain {
+    public static void main(String[] args) {
+        RootJava.restoreOriginalLdLibraryPath(); // call this first!
+
+        if (BuildConfig.DEBUG) {
+            Debugger.waitFor(true); // wait for connection
+        }
+
+        setYourBreakpointHere();
+    }
+}
+```
+
+We wrap the call inside a ```BuildConfig.DEBUG``` check, again to prevent
+issues with release builds.
+
+Note that for long-running processes (such as daemons) you may not want
+to explicitly wait for a debugger connection, in that case you can use
+the ```Debugger.setName()``` method instead. That method may also be 
+called *before* ```Debugger.waitFor()``` to customize the debugger
+display name, as by default the process name is used.
+
+Now that debugging is enabled, we still need to actually connect to
+the process. You can do this in Android Studio via the *Attach
+debugger to Android process* option in the *Run* menu. Once the root
+process is running, it will be listed in the popup window.
+
+Note that you can debug *both* the non-root *and* root process at the
+same time. While Android Studio can only debug a single application
+*launched* in debug mode, you can *attach* to multiple processes. So
+you can simply run your application in debug mode, have it launch the
+root process, then *attach* to that root process, and debug both
+simultaneously.
+
+Android Studio of course has no knowledge of the relation between the
+multiple processes being debugged, so stepping into an IPC call in one
+process will not automatically break on the implementation code in the
+other process. You will have to set those breakpoints manually.
+
+#### BuildConfig
+
+The example snippets and projects make extensive use of the BuildConfig
+class. This class is generated during the build process for every
+module, library, etc. Double check you are importing the correct
+BuildConfig class, the one from your application's package (unless you
+know exactly what you're doing). Note that this complicates putting this
+code inside libraries and modules, as you cannot reference the
+application's BuildConfig class from a library. Work-arounds are beyond
+the scope of this README.
+
 #### Daemonizing
 
 For some use-cases you may want to run your root process as a daemon,
@@ -348,7 +419,7 @@ an Android 10 preview comes out!
 ## Gradle
 
 ```
-implementation 'eu.chainfire:librootjava:1.0.0'
+implementation 'eu.chainfire:librootjava:1.1.0'
 ```
 
 ## Notes

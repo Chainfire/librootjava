@@ -52,6 +52,7 @@ import dalvik.system.BaseDexClassLoader;
  * @see #getSystemContext()
  * @see #getPackageContext(String)
  * @see #getLibraryPath(Context, String)
+ * @see Debugger#setEnabled(boolean)
  */
 @SuppressWarnings({"unused", "WeakerAccess", "Convert2Diamond"})
 public class RootJava {
@@ -182,10 +183,15 @@ public class RootJava {
         if (niceName != null) {
             extraParams += " --nice-name=" + niceName;
         }
-        //TODO debugging; the next line is successful in creating a jdwp server on Pie, and it's listed in 'adb jdwp', but connecting to it seemingly does nothing
-        //vmParams += " -XjdwpProvider:adbconnection -XjdwpOptions:transport=dt_android_adb,suspend=n,server=y";
-        //vmParams += " -agentlib:jdwp=transport=dt_android_adb,suspend=n,server=y";
-        // android.os.Debug.waitForDebugger(); can be used in root's Main
+        if (Debugger.enabled) { // we don't use isEnabled() because that has a different meaning when called as root, and though rare we might call this method from root too
+            vmParams += " -Xcompiler-option --debuggable";
+            if (Build.VERSION.SDK_INT >= 28) {
+                // Android 9.0 Pie changed things up a bit
+                vmParams += " -XjdwpProvider:internal -XjdwpOptions:transport=dt_android_adb,suspend=n,server=y";
+            } else {
+                vmParams += " -agentlib:jdwp=transport=dt_android_adb,suspend=n,server=y";
+            }
+        }
         String ret = String.format("NO_ADDR_COMPAT_LAYOUT_FIXUP=1 %sCLASSPATH=%s %s%s /system/bin%s %s", prefix.toString(), packageCodePath, app_process, vmParams, extraParams, clazz);
         if (params != null) {
             StringBuilder full = new StringBuilder(ret);

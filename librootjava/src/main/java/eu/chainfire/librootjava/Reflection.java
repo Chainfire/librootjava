@@ -212,6 +212,45 @@ class Reflection {
     }
 
     /**
+     * Determine if debugging is enabled on the VM level<br>
+     * <br>
+     * Stability: unlikely to change, this implementation works from 1.6 through 9.0<br>
+     *
+     * @see Debugger#isEnabled()
+     *
+     * @return Debugging enabled
+     */
+    @SuppressLint("PrivateApi")
+    static boolean isDebuggingEnabled() {
+        try {
+            Class<?> cVMDebug = Class.forName("dalvik.system.VMDebug");
+            Method mIsDebuggingEnabled = cVMDebug.getDeclaredMethod("isDebuggingEnabled");
+            return (Boolean)mIsDebuggingEnabled.invoke(null);
+        } catch (Exception e) {
+            Logger.ex(e);
+            return false;
+        }
+    }
+
+    /**
+     * Set app name for debugger connection
+     * <br>
+     * Stability: unlikely to change, this implementation works from 1.6 through 9.0<br>
+     *
+     * @see Debugger#setName(String)
+     */
+    @SuppressLint("PrivateApi")
+    static void setAppName(String name) {
+        try {
+            Class<?> cDdmHandleAppName = Class.forName("android.ddm.DdmHandleAppName");
+            Method m = cDdmHandleAppName.getDeclaredMethod("setAppName", String.class, int.class);
+            m.invoke(null, name, 0);
+        } catch (Exception e) {
+            Logger.ex(e);
+        }
+    }
+
+    /**
      * Internal class to retrieve an interface from a Binder (Proxy)
      *
      * @param <T> Interface

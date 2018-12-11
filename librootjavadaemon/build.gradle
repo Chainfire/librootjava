@@ -23,11 +23,14 @@ android {
 }
 
 dependencies {
-    /* Uncomment this line and commment the other one during development to use the local maven
-       repository version, installed by the installMavenLocal Gradle task */
-    //implementation('eu.chainfire:librootjava:1.0.0-SNAPSHOT') { changing = true }
+    /* Use module sources directly */
+    //implementation project(':librootjava')
 
-    implementation 'eu.chainfire:librootjava:1.0.0'
+    /* Use local Maven repository version, installed by installMavenLocal Gradle task */
+    //implementation('eu.chainfire:librootjava:1.1.0-SNAPSHOT') { changing = true }
+
+    /* Use bintray/jcenter version */
+    implementation 'eu.chainfire:librootjava:1.1.0'
 }
 
 task sourcesJar(type: Jar) {
@@ -61,7 +64,7 @@ ext {
     gitUrl = 'https://github.com/Chainfire/librootjava.git'
     issueTrackerUrl = 'https://github.com/Chainfire/librootjava/issues'
 
-    libraryVersion = '1.0.0'
+    libraryVersion = '1.1.0'
 
     developerId = 'Chainfire'
     developerName = 'Jorrit Jongma'
@@ -82,7 +85,7 @@ task installMavenLocal(type: Upload) {
             packaging 'aar'
             groupId = publishedGroupId
             artifactId = artifact
-            version = '1.0.0-SNAPSHOT'
+            version = libraryVersion + '-SNAPSHOT'
         }
     }
 }
