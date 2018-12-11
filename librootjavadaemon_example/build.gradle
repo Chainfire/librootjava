@@ -29,11 +29,17 @@ dependencies {
 
     implementation 'eu.chainfire:libsuperuser:1.0.0.+'
 
-    /* Uncomment these lines and commment the other ones during development to use the local maven
-       repository version, installed by the installMavenLocal Gradle task */
+    // --- librootjava and librootjavadaemon dependencies ---
+
+    /* Use module sources directly */
+    //implementation project(':librootjava')
+    //implementation project(':librootjavadaemon')
+
+    /* Use local Maven repository version, installed by installMavenLocal Gradle task */
     //implementation('eu.chainfire:librootjava:1.0.0-SNAPSHOT') { changing = true }
     //implementation('eu.chainfire:librootjavadaemon:1.0.0-SNAPSHOT') { changing = true }
 
+    /* Use bintray/jcenter version */
     implementation 'eu.chainfire:librootjava:1.0.0'
     implementation 'eu.chainfire:librootjavadaemon:1.0.0'
 }
