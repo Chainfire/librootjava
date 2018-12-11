@@ -23,7 +23,9 @@ class Reflection {
     private static Context systemContext = null;
 
     /**
-     * Stability: unlikely to change, this implementation works from 1.6 through 9.0
+     * Retrieve system context<br>
+     * <br>
+     * Stability: unlikely to change, this implementation works from 1.6 through 9.0<br>
      *
      * @see RootJava#getSystemContext()
      *
@@ -66,7 +68,9 @@ class Reflection {
     private static Object oActivityManager = null;
 
     /**
-     * Retrieve ActivityManager instance without needing a context
+     * Retrieve ActivityManager instance without needing a context<br>
+     * <br>
+     * Stability: has changed before, might change again, rare
      *
      * @return ActivityManager
      */
@@ -108,7 +112,9 @@ class Reflection {
     private static Integer FLAG_RECEIVER_FROM_SHELL = null;
 
     /**
-     * Retrieve value of Intent.FLAG_RECEIVER_FROM_SHELL, if it exists
+     * Retrieve value of Intent.FLAG_RECEIVER_FROM_SHELL, if it exists<br>
+     * <br>
+     * Stability: stable, even if the flag goes away again this is unlikely to affect things
      *
      * @return FLAG_RECEIVER_FROM_SHELL or 0
      */
@@ -167,8 +173,10 @@ class Reflection {
     }
 
     /**
-     * Stability: the implementation for this will definitely change over time
-     *
+     * Broadcast intent<br>
+     * <br>
+     * Stability: the implementation for this will definitely change over time<br>
+     * <br>
      * This implementation does not require us to have a context
      *
      * @see RootJava#sendBroadcast(Intent)
@@ -203,6 +211,11 @@ class Reflection {
         throw new RuntimeException("librootjava: unable to send broadcast");
     }
 
+    /**
+     * Internal class to retrieve an interface from a Binder (Proxy)
+     *
+     * @param <T> Interface
+     */
     @SuppressWarnings("unchecked")
     static class InterfaceRetriever<T> {
         /**
