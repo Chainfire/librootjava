@@ -28,6 +28,7 @@ import java.util.Locale;
 
 import eu.chainfire.librootjava.Logger;
 import eu.chainfire.librootjava.RootIPCReceiver;
+import eu.chainfire.librootjavadaemon.RootDaemon;
 import eu.chainfire.librootjavadaemon_example.root.IIPC;
 import eu.chainfire.librootjavadaemon_example.root.RootMain;
 import eu.chainfire.libsuperuser.Debug;
@@ -70,6 +71,12 @@ public class MainActivity extends AppCompatActivity {
         textView.setHorizontallyScrolling(true);
         textView.setMovementMethod(new ScrollingMovementMethod());
         ipcReceiver.setContext(this);
+        (new Thread(new Runnable() {
+            @Override
+            public void run() {
+                RootDaemon.cleanupCache(MainActivity.this);
+            }
+        })).start();
     }
 
     @Override

@@ -263,6 +263,18 @@ non-root code.
 (See the [example project](../librootjava_example) for a more elaborate
 example for this entire process)
 
+#### Cleanup
+
+To execute our code as root, files may need to be created in our app's
+cache directory. While the library does its best to clean up after
+itself, there are situations (such as a reboot mid-process) where some
+files may not automatically be removed.
+
+It is recommended to periodically call ```RootJava.cleanupCache()```
+to remove these leftover files. This method will cleanup all of our
+files in the cache directory that predate the current boot. As I/O is
+performed, this method should not be called from the main UI thread.
+
 #### Debugging
 
 Debugging is supported since version 1.1.0, but disabled by default.

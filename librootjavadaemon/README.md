@@ -126,6 +126,16 @@ non-root end when called through IPC.
 See the [example project](../librootjavadaemon_example) for further
 details.
 
+#### Cleanup
+
+As with running code as root in normal (non-daemon) mode, files may need
+to be created in our app's cache directory. The chances of leftover
+files are actually higher in daemon mode, and the number of files is
+higher too.
+
+To clean up, call ```RootDaemon.cleanupCache()``` instead of
+```RootJava.cleanupCache()```. It is *not* needed to call both.
+
 ## abiFilters
 
 This library includes native code for all platforms the NDK supports.

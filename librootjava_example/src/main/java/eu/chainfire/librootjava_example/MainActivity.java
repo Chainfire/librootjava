@@ -34,6 +34,7 @@ import java.util.Locale;
 
 import eu.chainfire.librootjava.Logger;
 import eu.chainfire.librootjava.RootIPCReceiver;
+import eu.chainfire.librootjava.RootJava;
 import eu.chainfire.librootjava_example.root.IIPC;
 import eu.chainfire.librootjava_example.root.IPingCallback;
 import eu.chainfire.librootjava_example.root.PassedData;
@@ -80,6 +81,15 @@ public class MainActivity extends AppCompatActivity {
            wrapper. We need to update it to a proper context, so we may actually receive the Binder
            object from our root code. */
         ipcReceiver.setContext(this);
+
+        /* Cleanup leftover files from our cache directory. This is not exactly an elegant way to
+           do it, but it illustrates that this should be done off of the main UI thread. */
+        (new Thread(new Runnable() {
+            @Override
+            public void run() {
+                RootJava.cleanupCache(MainActivity.this);
+            }
+        })).start();
     }
 
     @Override

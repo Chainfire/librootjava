@@ -117,6 +117,23 @@ public class RootDaemon {
         return patchLaunchScript(context, RootJava.getLaunchScript(context, clazz, app_process, relocate_path, params, niceName));
     }
 
+    /** Prefixes of filename to remove from the app's cache directory */
+    public static final String[] CLEANUP_CACHE_PREFIXES = new String[] { ".daemonize_" };
+
+    /**
+     * Clean up leftover files from our cache directory.<br>
+     * <br>
+     * Call this method instead of (not in addition to) RootJava#cleanupCache(Context).
+     *
+     * @param context Context to retrieve cache directory from
+     */
+    public static void cleanupCache(Context context) {
+        String[] prefixes = new String[RootJava.CLEANUP_CACHE_PREFIXES.length + CLEANUP_CACHE_PREFIXES.length];
+        System.arraycopy(RootJava.CLEANUP_CACHE_PREFIXES, 0, prefixes, 0, RootJava.CLEANUP_CACHE_PREFIXES.length);
+        System.arraycopy(CLEANUP_CACHE_PREFIXES, 0, prefixes, RootJava.CLEANUP_CACHE_PREFIXES.length, CLEANUP_CACHE_PREFIXES.length);
+        RootJava.cleanupCache(context, prefixes);
+    }
+
     // ------------------------ calls for root ------------------------
 
     /** Registered interfaces */
@@ -183,7 +200,7 @@ public class RootDaemon {
                 } else {
                     Logger.dp(LOG_PREFIX, "Service already running, requesting re-broadcast and aborting");
                     ipc.broadcast();
-                    System.exit(0);
+                    exit();
                 }
             }
 
@@ -327,6 +344,16 @@ public class RootDaemon {
             if (app_process.exists() && !app_process.getAbsolutePath().startsWith("/system/bin/")) {
                 //noinspection ResultOfMethodCallIgnored
                 app_process.delete();
+
+                // See if we can also find a copy of the daemonize binary
+                String daemonize_path = app_process.getAbsolutePath();
+                daemonize_path = daemonize_path.replace(".app_process32_", ".daemonize_");
+                daemonize_path = daemonize_path.replace(".app_process64_", ".daemonize_");
+                File daemonize = new File(daemonize_path);
+                if (daemonize.exists()) {
+                    //noinspection ResultOfMethodCallIgnored
+                    daemonize.delete();
+                }
             }
         } catch (IOException e) {
             // should never actually happen

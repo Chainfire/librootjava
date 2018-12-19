@@ -21,8 +21,10 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.SystemClock;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -245,6 +247,69 @@ public class RootJava {
         script.add(getLaunchString(context, clazz, app_process, params, niceName));
         script.addAll(post);
         return script;
+    }
+
+    /** Prefixes of filename to remove from the app's cache directory */
+    public static final String[] CLEANUP_CACHE_PREFIXES = new String[] { ".app_process32_", ".app_process64_" };
+
+    /**
+     * Clean up leftover files from our cache directory.<br>
+     * <br>
+     * In ideal circumstances no files should be left dangling, but in practise it happens sooner
+     * or later anyway. Periodically (once per app launch or per boot) calling this method is
+     * advised.<br>
+     * <br>
+     * This method should be called from a background thread, as it performs disk i/o.<br>
+     * <br>
+     * It is difficult to determine which of these files may actually be in use, especially in
+     * daemon mode. We try to determine device boot time, and wipe everything from before that
+     * time. For safety we explicitly keep files using our current UUID.
+     *
+     * @param context Context to retrieve cache directory from
+     */
+    public static void cleanupCache(Context context) {
+        cleanupCache(context, CLEANUP_CACHE_PREFIXES);
+    }
+
+    /**
+     * Clean up leftover files from our cache directory.<br>
+     * <br>
+     * This version is for internal use, see {@link #cleanupCache(Context)} instead.
+     *
+     * @param context Context to retrieve cache directory from
+     * @param prefixes List of prefixes to scrub
+     */
+    public static void cleanupCache(Context context, final String[] prefixes) {
+        try {
+            File cacheDir = context.getCacheDir();
+            if (cacheDir.exists()) {
+                // determine time of last boot
+                long boot = System.currentTimeMillis() - SystemClock.elapsedRealtime();
+
+                // find our files
+                for (File file : cacheDir.listFiles(new FilenameFilter() {
+                    @Override
+                    public boolean accept(File dir, String name) {
+                        boolean accept = false;
+                        for (String prefix : prefixes) {
+                            // just in case: don't return files that contain our current uuid
+                            if (name.startsWith(prefix) && !name.endsWith(AppProcess.UUID)) {
+                                accept = true;
+                                break;
+                            }
+                        }
+                        return accept;
+                    }
+                })) {
+                    if (file.lastModified() < boot) {
+                        //noinspection ResultOfMethodCallIgnored
+                        file.delete();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Logger.ex(e);
+        }
     }
 
     // ------------------------ calls for root ------------------------
