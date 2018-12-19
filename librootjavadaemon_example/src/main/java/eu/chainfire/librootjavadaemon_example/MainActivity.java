@@ -70,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
         textView = findViewById(R.id.textView);
         textView.setHorizontallyScrolling(true);
         textView.setMovementMethod(new ScrollingMovementMethod());
+
+        // See librootjava's example for further commentary on these two calls
         ipcReceiver.setContext(this);
         (new Thread(new Runnable() {
             @Override
