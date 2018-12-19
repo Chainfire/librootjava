@@ -76,8 +76,11 @@ public class RootDaemon {
                 // copy our executable
                 String libSrc = RootJava.getLibraryPath(context, "daemonize");
                 String libDest = app_process_path + "/.daemonize_" + AppProcess.uuid;
+                boolean onData = libDest.startsWith("/data/");
+
                 ret.add(String.format(Locale.ENGLISH, "%s cp %s %s >/dev/null 2>/dev/null", AppProcess.box, libSrc, libDest));
-                ret.add(String.format(Locale.ENGLISH, "%s chmod 0700 %s >/dev/null 2>/dev/null", AppProcess.box, libDest));
+                ret.add(String.format(Locale.ENGLISH, "%s chmod %s %s >/dev/null 2>/dev/null", AppProcess.box, onData ? "0766" : "0700", libDest));
+                if (onData) ret.add(String.format(Locale.ENGLISH, "restorecon %s >/dev/null 2>/dev/null", libDest));
 
                 // inject executable into command
                 int idx = line.indexOf(app_process);

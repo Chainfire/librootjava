@@ -321,6 +321,8 @@ public class AppProcess {
             }
         }
 
+        boolean onData = path.startsWith("/data/");
+
         String appProcessCopy;
         if (guessIfAppProcessIs64Bits(appProcessBase)) {
             appProcessCopy = path + "/.app_process64_" + uuid;
@@ -328,7 +330,8 @@ public class AppProcess {
             appProcessCopy = path + "/.app_process32_" + uuid;
         }
         preLaunch.add(String.format(Locale.ENGLISH, "%s cp %s %s >/dev/null 2>/dev/null", box, appProcessBase, appProcessCopy));
-        preLaunch.add(String.format(Locale.ENGLISH, "%s chmod 0700 %s >/dev/null 2>/dev/null", box, appProcessCopy));
+        preLaunch.add(String.format(Locale.ENGLISH, "%s chmod %s %s >/dev/null 2>/dev/null", box, onData ? "0766" : "0700", appProcessCopy));
+        if (onData) preLaunch.add(String.format(Locale.ENGLISH, "restorecon %s >/dev/null 2>/dev/null", appProcessCopy));
         postExecution.add(String.format(Locale.ENGLISH, "%s rm %s >/dev/null 2>/dev/null", box, appProcessCopy));
         return appProcessCopy;
     }
