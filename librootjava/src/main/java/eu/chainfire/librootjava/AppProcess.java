@@ -27,7 +27,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 
 /**
  * Utility methods to determine the location and bits of the app_process executable to be used.<br>
@@ -43,12 +42,12 @@ public class AppProcess {
     /**
      * Toolbox or toybox?
      */
-    public static final String box = Build.VERSION.SDK_INT < 23 ? "toolbox" : "toybox";
+    public static final String BOX = Build.VERSION.SDK_INT < 23 ? "toolbox" : "toybox";
 
     /**
      * Used to create unique filenames in common locations
      */
-    public static final String uuid = getUUID();
+    public static final String UUID = getUUID();
 
     /**
      * @return uuid that doesn't contain 32 or 64, as to not confuse bit-choosing code
@@ -56,7 +55,7 @@ public class AppProcess {
     private static String getUUID() {
         String uuid = null;
         while ((uuid == null) || uuid.contains("32") || uuid.contains("64")) {
-            uuid = UUID.randomUUID().toString();
+            uuid = java.util.UUID.randomUUID().toString();
         }
         return uuid;
     }
@@ -325,14 +324,14 @@ public class AppProcess {
 
         String appProcessCopy;
         if (guessIfAppProcessIs64Bits(appProcessBase)) {
-            appProcessCopy = path + "/.app_process64_" + uuid;
+            appProcessCopy = path + "/.app_process64_" + UUID;
         } else {
-            appProcessCopy = path + "/.app_process32_" + uuid;
+            appProcessCopy = path + "/.app_process32_" + UUID;
         }
-        preLaunch.add(String.format(Locale.ENGLISH, "%s cp %s %s >/dev/null 2>/dev/null", box, appProcessBase, appProcessCopy));
-        preLaunch.add(String.format(Locale.ENGLISH, "%s chmod %s %s >/dev/null 2>/dev/null", box, onData ? "0766" : "0700", appProcessCopy));
+        preLaunch.add(String.format(Locale.ENGLISH, "%s cp %s %s >/dev/null 2>/dev/null", BOX, appProcessBase, appProcessCopy));
+        preLaunch.add(String.format(Locale.ENGLISH, "%s chmod %s %s >/dev/null 2>/dev/null", BOX, onData ? "0766" : "0700", appProcessCopy));
         if (onData) preLaunch.add(String.format(Locale.ENGLISH, "restorecon %s >/dev/null 2>/dev/null", appProcessCopy));
-        postExecution.add(String.format(Locale.ENGLISH, "%s rm %s >/dev/null 2>/dev/null", box, appProcessCopy));
+        postExecution.add(String.format(Locale.ENGLISH, "%s rm %s >/dev/null 2>/dev/null", BOX, appProcessCopy));
         return appProcessCopy;
     }
 }
