@@ -91,7 +91,7 @@ public class RootMain {
      */
     private void run(String[] args) {
         // Become the daemon
-        RootDaemon.daemonize(BuildConfig.APPLICATION_ID, 0);
+        RootDaemon.daemonize(BuildConfig.APPLICATION_ID, 0, false, null);
 
         // Restore original LD_LIBRARY_PATH
         RootJava.restoreOriginalLdLibraryPath();
