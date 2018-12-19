@@ -194,12 +194,12 @@ class Reflection {
             Method mBroadcastIntent = getBroadcastIntent(oActivityManager.getClass());
             if (mBroadcastIntent.getParameterTypes().length == 13) {
                 // API 24+
-                mBroadcastIntent.invoke(oActivityManager, null, intent, null, null, 0, null, null, null, -1, null, true, false, 0);
+                mBroadcastIntent.invoke(oActivityManager, null, intent, null, null, 0, null, null, null, -1, null, false, false, 0);
                 return;
             }
             if (mBroadcastIntent.getParameterTypes().length == 12) {
                 // API 21+
-                mBroadcastIntent.invoke(oActivityManager, null, intent, null, null, 0, null, null, null, -1, true, false, 0);
+                mBroadcastIntent.invoke(oActivityManager, null, intent, null, null, 0, null, null, null, -1, false, false, 0);
                 return;
             }
         } catch (Exception e) {

@@ -149,6 +149,7 @@ public class RootIPC {
         Intent intent = new Intent();
         intent.setPackage(packageName);
         intent.setAction(RootIPCReceiver.BROADCAST_ACTION);
+        intent.setFlags(Intent.FLAG_RECEIVER_FOREGROUND);
 
         Bundle bundle = new Bundle();
         bundle.putBinder(RootIPCReceiver.BROADCAST_BINDER, binder);
