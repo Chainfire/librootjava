@@ -431,7 +431,7 @@ an Android 10 preview comes out!
 ## Gradle
 
 ```
-implementation 'eu.chainfire:librootjava:1.1.0'
+implementation 'eu.chainfire:librootjava:1.2.0'
 ```
 
 ## Notes
