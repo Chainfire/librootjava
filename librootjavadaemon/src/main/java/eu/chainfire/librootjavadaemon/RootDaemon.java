@@ -36,7 +36,7 @@ import eu.chainfire.librootjava.RootJava;
  * Class with utility function sto launch Java code running as a root as a daemon
  *
  * @see #getLaunchScript(Context, Class, String, String, String[], String)
- * @see #daemonize(String, int)
+ * @see #daemonize(String, int, boolean, OnExitListener)
  * @see #run()
  * @see #exit()
  */
@@ -122,6 +122,14 @@ public class RootDaemon {
     /** Registered interfaces */
     private static final List<RootIPC> ipcs = new ArrayList<RootIPC>();
 
+    /** Called before termination */
+    public interface OnExitListener {
+        void onExit();
+    }
+
+    /** Stored by daemonize(), called by exit() */
+    private static volatile OnExitListener onExitListener = null;
+
     /**
      * Makes sure there is only a single daemon running with this code parameter. This should
      * be one of the first calls in your process to be run as daemon, just after setting up logging
@@ -145,9 +153,11 @@ public class RootDaemon {
      *
      * @param packageName Package name of the app. BuildConfig.APPLICATION_ID can generally be used.
      * @param code User-value, should be unique per daemon process
+     * @param surviveFrameworkRestart If false (recommended), automatically terminate if the Android framework restarts
+     * @param exitListener Callback called before the daemon exists either due to a newer daemon version being started or {@link #exit()} being called, or null
      */
     @SuppressLint("PrivateApi")
-    public static void daemonize(String packageName, int code) {
+    public static void daemonize(String packageName, int code, boolean surviveFrameworkRestart, OnExitListener exitListener) {
         String id = packageName + "#" + String.valueOf(code) + "#daemonize";
 
         File apk = new File(System.getenv("CLASSPATH"));
@@ -178,7 +188,34 @@ public class RootDaemon {
             }
 
             // If we reach this, there either was no previous daemon, or it was outdated
-            Logger.ep(LOG_PREFIX, "Installing service");
+            Logger.dp(LOG_PREFIX, "Installing service");
+            onExitListener = exitListener;
+
+            if (!surviveFrameworkRestart) {
+                /* We link to Android's activity service, which lives in system_server. If the
+                   framework is restarted, for example through stop/start in a root shell, this
+                   service will die and we will be notified.
+
+                   Obviously when setting surviveFrameworkRestart to true, things you do in
+                   your own code may still cause this process to terminate when the framework
+                   dies, we're just not doing it automatically. */
+
+                IBinder activityService = (IBinder)mGetService.invoke(null, Context.ACTIVITY_SERVICE);
+                if (activityService != null) {
+                    try {
+                        activityService.linkToDeath(new IBinder.DeathRecipient() {
+                            @Override
+                            public void binderDied() {
+                                exit();
+                            }
+                        }, 0);
+                    } catch (RemoteException e) {
+                        // already dead
+                        exit();
+                    }
+                }
+            }
+
             mAddService.invoke(null, id, new IRootDaemonIPC.Stub() {
                 @Override
                 public String getVersion() {
@@ -211,7 +248,7 @@ public class RootDaemon {
      * <br>
      * Use this method instead of librootjava's 'new RootIPC()' constructor when running as daemon.
      *
-     * @param packageName Package name of the app. Use the same value as used when calling {@link #daemonize(String, int)}.
+     * @param packageName Package name of the app. Use the same value as used when calling {@link #daemonize(String, int, boolean, OnExitListener)}.
      * @param ipc Binder object to wrap and send out
      * @param code User-value, should be unique per Binder
      * @return RootIPC instance
@@ -239,7 +276,8 @@ public class RootDaemon {
      * the main() implementation. The initial Binder broadcasts and the connections themselves
      * are handled in background threads created by the RootIPC instances created when
      * {@link #register(String, IBinder, int)} is called, and re-broadcasting those interfaces
-     * is done by the internal Binder interface registered by {@link #daemonize(String, int)}.<br>
+     * is done by the internal Binder interface registered by
+     * {@link #daemonize(String, int, boolean, OnExitListener)}.<br>
      * <br>
      * This method never returns!
      */
@@ -263,15 +301,23 @@ public class RootDaemon {
      * RemoteException on the other end.
      */
     public static void exit() {
+        /* We do not return from the run() call but immediately exit, so if this method is called
+           from inside a Binder interface method implementation, the process has died before the
+           IPC call to terminate completes on the other end. This triggers a RemoteException so the
+           other end can easily verify this process has terminated. It also prevents a
+           race-condition between the old service dying and new service registering. Additionally it
+           saves us from having to use another synchronizer to cope with a termination request
+           coming in from another daemon launch before run() is actually called. */
+
         Logger.dp(LOG_PREFIX, "Exiting");
 
-        /* We do not return from the run() call but immediately exit, so the process has died
-           before the IPC call to terminate completes on the other end. This triggers a
-           RemoteException so the other end can easily verify this process has terminated. It
-           also prevents a race-condition between the old service dying and new service registering.
-           Additionally it saves us from having to use another synchronizer to cope with a
-           termination request coming in from another daemon launch before run() is actually
-           called. */
+        try {
+            if (onExitListener != null) {
+                onExitListener.onExit();
+            }
+        } catch (Exception e) {
+            Logger.ex(e);
+        }
 
         try {
             /* Unlike when using RootJava.getLaunchScript(), RootDaemon.getLaunchScript() does

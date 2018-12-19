@@ -61,7 +61,7 @@ statements (generally after setting up logging):
         // If a daemon of the same version is already running, this
         // call will trigger process termination, and will thus
         // never return.
-        RootDaemon.daemonize(BuildConfig.APPLICATION_ID, 0);
+        RootDaemon.daemonize(BuildConfig.APPLICATION_ID, 0, false, null);
 
         // ...
 
@@ -113,14 +113,15 @@ them with your own handling.
 #### Termination
 
 This daemon process will only terminate when explicitly told to do so,
-either through IPC or a Linux kill signal (or if an unhandled
-exception occurs). This is why in the example above we add a
+either through IPC, a Linux kill signal, if an unhandled
+exception occurs, or (if so configured) when the Android framework
+dies. This is why in the example above we add a
 ```terminate()``` method to our IPC interface which calls
 ```RootDaemon.exit()```. This way you can tell the daemon to
 stop running from your non-root app through IPC.
 
 Note that this method will always trigger a ```RemoteException``` on the
-non-root end when called.
+non-root end when called through IPC.
 
 See the [example project](../librootjavadaemon_example) for further
 details.
