@@ -151,7 +151,7 @@ on the Android site.
 ## Gradle
 
 ```
-implementation 'eu.chainfire:librootjavadaemon:1.2.0'
+implementation 'eu.chainfire:librootjavadaemon:1.3.0'
 ```
 
 You should update to the latest libRootJava and libRootJavaDaemon at the
