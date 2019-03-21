@@ -73,18 +73,27 @@ public class RootDaemon {
                 // patch the main script line
                 String app_process_path = app_process.substring(0, app_process.lastIndexOf('/'));
 
-                // copy our executable
-                String libSrc = RootJava.getLibraryPath(context, "daemonize");
-                String libDest = app_process_path + "/.daemonize_" + AppProcess.UUID;
-                boolean onData = libDest.startsWith("/data/");
+                // our executable
+                String libSource = RootJava.getLibraryPath(context, "daemonize");
+                String libExec;
 
-                ret.add(String.format(Locale.ENGLISH, "%s cp %s %s >/dev/null 2>/dev/null", AppProcess.BOX, libSrc, libDest));
-                ret.add(String.format(Locale.ENGLISH, "%s chmod %s %s >/dev/null 2>/dev/null", AppProcess.BOX, onData ? "0766" : "0700", libDest));
-                if (onData) ret.add(String.format(Locale.ENGLISH, "restorecon %s >/dev/null 2>/dev/null", libDest));
+                if (app_process_path.startsWith("/system/bin")) {
+                    // app_process was not relocated, assume caller knows what he's doing, and
+                    // run our executable from its library location
+                    libExec = libSource;
+                } else {
+                    // copy our executable
+                    libExec = app_process_path + "/.daemonize_" + AppProcess.UUID;
+                    boolean onData = libExec.startsWith("/data/");
+
+                    ret.add(String.format(Locale.ENGLISH, "%s cp %s %s >/dev/null 2>/dev/null", AppProcess.BOX, libSource, libExec));
+                    ret.add(String.format(Locale.ENGLISH, "%s chmod %s %s >/dev/null 2>/dev/null", AppProcess.BOX, onData ? "0766" : "0700", libExec));
+                    if (onData) ret.add(String.format(Locale.ENGLISH, "restorecon %s >/dev/null 2>/dev/null", libExec));
+                }
 
                 // inject executable into command
                 int idx = line.indexOf(app_process);
-                ret.add(line.substring(0, idx) + libDest + " " + line.substring(idx));
+                ret.add(line.substring(0, idx) + libExec + " " + line.substring(idx));
 
                 in_post = true;
             } else if (in_post && line.contains("box rm")) {

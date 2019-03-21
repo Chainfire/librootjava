@@ -284,12 +284,36 @@ public class AppProcess {
     }
 
     /**
+     * Should app_process be relocated ?<br>
+     * <br>
+     * On older Android versions we must relocate the app_process binary to prevent it from
+     * running in a restricted SELinux context. On Q this presents us with the linker error:
+     * "<i>Error finding namespace of apex: no namespace called runtime</i>". However, at least
+     * on the first preview release of Q, running straight from /system/bin works and does
+     * <i>not</i> give us a restricted SELinux context, so we skip relocation.
+     *
+     * TODO: Revisit on new Q preview and production releases. Maybe spend some time figuring out what causes the namespace error and if we can fix it.
+     *
+     * @see #getAppProcessRelocate(Context, String, List, List, String)
+     *
+     * @return should app_process be relocated ?
+     */
+    @TargetApi(Build.VERSION_CODES.M)
+    public static boolean shouldAppProcessBeRelocated() {
+        return !(
+            (Build.VERSION.SDK_INT >= 29) ||
+            ((Build.VERSION.SDK_INT == 28) && (Build.VERSION.PREVIEW_SDK_INT != 0))
+        );
+    }
+
+    /**
      * Create script to relocate specified app_process binary to a different location.<br>
      * <br>
      * On many Android versions and roots, executing app_process directly will force an
      * SELinux context that we do not want. Relocating it bypasses that.<br>
      *
      * @see #getAppProcess()
+     * @see #shouldAppProcessBeRelocated()
      *
      * @param context Application or activity context
      * @param appProcessBase Path to original app_process or null for default
@@ -301,6 +325,10 @@ public class AppProcess {
     public static String getAppProcessRelocate(Context context, String appProcessBase, List<String> preLaunch, List<String> postExecution, String path) {
         if (appProcessBase == null) appProcessBase = getAppProcess();
         if (path == null) {
+            if (!shouldAppProcessBeRelocated()) {
+                return appProcessBase;
+            }
+
             path = "/dev";
             if ((context.getApplicationInfo().flags & ApplicationInfo.FLAG_EXTERNAL_STORAGE) == 0) {
                 File cacheDir = context.getCacheDir();
