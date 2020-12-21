@@ -184,7 +184,7 @@ public class RootDaemon {
      */
     @SuppressLint("PrivateApi")
     public static void daemonize(String packageName, int code, boolean surviveFrameworkRestart, OnExitListener exitListener) {
-        String id = packageName + "#" + String.valueOf(code) + "#daemonize";
+        String id = packageName + "_" + String.valueOf(code) + "_daemonize";
 
         File apk = new File(System.getenv("CLASSPATH"));
         final String version = String.format(Locale.ENGLISH, "%s:%d:%d", apk.getAbsolutePath(), apk.lastModified(), apk.length());
