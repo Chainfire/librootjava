@@ -37,10 +37,10 @@ dependencies {
     //implementation project(':librootjavadaemon')
 
     /* Use local Maven repository version, installed by installMavenLocal Gradle task */
-    //implementation('eu.chainfire:librootjava:1.3.0-SNAPSHOT') { changing = true }
-    //implementation('eu.chainfire:librootjavadaemon:1.3.0-SNAPSHOT') { changing = true }
+    //implementation('eu.chainfire:librootjava:1.3.1-SNAPSHOT') { changing = true }
+    //implementation('eu.chainfire:librootjavadaemon:1.3.1-SNAPSHOT') { changing = true }
 
     /* Use bintray/jcenter version */
-    implementation 'eu.chainfire:librootjava:1.3.0'
-    implementation 'eu.chainfire:librootjavadaemon:1.3.0'
+    implementation 'eu.chainfire:librootjava:1.3.1'
+    implementation 'eu.chainfire:librootjavadaemon:1.3.1'
 }
