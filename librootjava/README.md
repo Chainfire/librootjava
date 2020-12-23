@@ -1,5 +1,7 @@
 # libRootJava
 
+[![ci][1]][2]
+
 Run Java (and Kotlin) code as root!
 
 - Runs code directly from your APK
@@ -19,6 +21,18 @@ crediting me is appreciated.
 
 If you modify the library itself when you use it in your projects,
 you are kindly requested to share the sources of those modifications.
+
+## Deprecated
+
+This library is not under active development right now, as I've mostly
+moved away from the Android world. While I believe it still works great,
+if it breaks due to changes on new Android versions or root solutions,
+fixes may be slow to appear.
+
+If you're writing a new app, you might consider using
+[TopJohnWu's libsu](https://github.com/topjohnwu/libsu) instead. Barring
+some edge-cases (that I personally seem to be the biggest user of) the
+capabilities should be similar, but it's likely to be better maintained.
 
 ## Spaghetti Sauce Project
 
@@ -439,3 +453,6 @@ implementation 'eu.chainfire:librootjava:1.3.1'
 This library includes its own Logger class that is used
 throughout, which should probably have been refactored out.
 It wasn't.
+
+[1]: https://github.com/Chainfire/libsuperuser/workflows/ci/badge.svg
+[2]: https://github.com/Chainfire/libsuperuser/actions
