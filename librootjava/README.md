@@ -454,5 +454,5 @@ This library includes its own Logger class that is used
 throughout, which should probably have been refactored out.
 It wasn't.
 
-[1]: https://github.com/Chainfire/libsuperuser/workflows/ci/badge.svg
-[2]: https://github.com/Chainfire/libsuperuser/actions
+[1]: https://github.com/Chainfire/librootjava/workflows/ci/badge.svg
+[2]: https://github.com/Chainfire/librootjava/actions
