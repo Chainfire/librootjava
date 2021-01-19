@@ -1,4 +1,6 @@
-# libRootJava Repository
+# librootjava
+
+[![ci][1]][2]
 
 This repository contains four modules, please see the ```README.md```s in
 their individual subfolders.
@@ -23,3 +25,6 @@ projects) in your projects, crediting me is appreciated.
 ## Spaghetti Sauce Project
 
 This project is part of the [Spaghetti Sauce Project](https://github.com/Chainfire/spaghetti_sauce_project).
+
+[1]: https://github.com/Chainfire/librootjava/workflows/ci/badge.svg
+[2]: https://github.com/Chainfire/librootjava/actions
