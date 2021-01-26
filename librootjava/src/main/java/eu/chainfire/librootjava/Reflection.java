@@ -59,7 +59,7 @@ class Reflection {
                 return systemContext;
             } catch (Exception e) {
                 Logger.ex(e);
-                throw new RuntimeException("librootjava: unexpected exception in getSystemContext()");
+                throw new RuntimeException("librootjava: unexpected exception in getSystemContext()", e);
             }
         }
     }
@@ -102,9 +102,8 @@ class Reflection {
                 return oActivityManager;
             } catch (Exception e) {
                 Logger.ex(e);
+                throw new RuntimeException("librootjava: unable to retrieve ActivityManager", e);
             }
-
-            throw new RuntimeException("librootjava: unable to retrieve ActivityManager");
         }
     }
 
