@@ -167,7 +167,7 @@ Module `build.gradle`:
 
 ```
 dependencies {
-    implementation 'eu.chainfire:librootjavadaemon:1.3.3'
+    implementation 'eu.chainfire.librootjava:librootjavadaemon:1.3.3'
 }
 ```
 

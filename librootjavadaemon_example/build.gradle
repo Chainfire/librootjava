@@ -41,5 +41,5 @@ dependencies {
 
     /* Use jitpack version */
     implementation 'eu.chainfire:librootjava:1.3.3'
-    implementation 'eu.chainfire:librootjavadaemon:1.3.3'
+    implementation 'eu.chainfire.librootjava:librootjavadaemon:1.3.3'
 }
