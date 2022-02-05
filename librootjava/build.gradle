@@ -1,6 +1,5 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'com.jfrog.bintray'
 
 android {
     compileSdkVersion 26
@@ -51,7 +50,7 @@ ext {
     gitUrl = 'https://github.com/Chainfire/librootjava.git'
     issueTrackerUrl = 'https://github.com/Chainfire/librootjava/issues'
 
-    libraryVersion = '1.3.1'
+    libraryVersion = '1.3.2'
 
     developerId = 'Chainfire'
     developerName = 'Jorrit Jongma'
@@ -80,35 +79,6 @@ task installMavenLocal(type: Upload) {
 // Workaround bintray bug ignoring these from pom and bintray settings
 version = libraryVersion
 group = publishedGroupId
-
-bintray {
-    Properties properties = new Properties()
-    if (project.rootProject.file('local.properties').exists()) {
-        properties.load(project.rootProject.file('local.properties').newDataInputStream())
-    }
-    user = properties.getProperty('bintray.user')
-    key = properties.getProperty('bintray.apikey')
-
-    configurations = ['archives']
-    dryRun = false
-    publish = true
-    pkg {
-        repo = bintrayRepo
-        name = libraryName
-        desc = libraryDescription
-        websiteUrl = siteUrl
-        issueTrackerUrl = issueTrackerUrl   // doesn't actually work?
-        vcsUrl = gitUrl
-        //githubRepo = gitUrl               // some more bintray weirdness here, breaks upload
-        //githubReleaseNotesFile = 'README.md'
-        licenses = allLicenses
-        publicDownloadNumbers = true
-        version {
-            name = libraryVersion
-            released = new Date()
-        }
-    }
-}
 
 install {
     repositories.mavenInstaller {
@@ -140,5 +110,3 @@ install {
         }
     }
 }
-
-bintrayUpload.dependsOn install

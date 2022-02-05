@@ -1,0 +1,2 @@
+install:
+   - ./gradlew clean :librootjava:install :librootjavadaemon:install
