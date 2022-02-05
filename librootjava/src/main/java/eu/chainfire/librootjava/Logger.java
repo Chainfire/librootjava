@@ -23,7 +23,7 @@ import java.util.Locale;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class Logger {
     private static String getDefaultLogTag(){
-        String tag = BuildConfig.APPLICATION_ID;
+        String tag = BuildConfig.LIBRARY_PACKAGE_NAME;
         int p;
         while ((p = tag.indexOf('.')) >= 0) {
             tag = tag.substring(p + 1);
