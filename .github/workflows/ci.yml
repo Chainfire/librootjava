@@ -9,4 +9,5 @@ jobs:
         with:
           java-version: 1.8
       - uses: gradle/wrapper-validation-action@v1
-      - run: ./gradlew build
+      - run: ./gradlew :librootjava:build
+
