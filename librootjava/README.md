@@ -1,6 +1,6 @@
 # libRootJava
 
-[![ci][1]][2]
+[![ci][1]][2] [![](https://jitpack.io/v/eu.chainfire/librootjava.svg)](https://jitpack.io/#eu.chainfire/librootjava)
 
 Run Java (and Kotlin) code as root!
 
@@ -444,8 +444,23 @@ an Android 10 preview comes out!
 
 ## Gradle
 
+Root `build.gradle`:
+
 ```
-implementation 'eu.chainfire:librootjava:1.3.1'
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+}
+```
+
+Module `build.gradle`:
+
+```
+dependencies {
+    implementation 'eu.chainfire:librootjava:1.3.3'
+}
 ```
 
 ## Notes

@@ -1,5 +1,7 @@
 # libRootJavaDaemon
 
+[![](https://jitpack.io/v/eu.chainfire/librootjava.svg)](https://jitpack.io/#eu.chainfire/librootjava)
+
 Add-on for [libRootJava](../librootjava) to run the root process as a
 daemon.
 
@@ -150,8 +152,23 @@ on the Android site.
 
 ## Gradle
 
+Root `build.gradle`:
+
 ```
-implementation 'eu.chainfire:librootjavadaemon:1.3.1'
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+}
+```
+
+Module `build.gradle`:
+
+```
+dependencies {
+    implementation 'eu.chainfire:librootjavadaemon:1.3.3'
+}
 ```
 
 You should update to the latest libRootJava and libRootJavaDaemon at the

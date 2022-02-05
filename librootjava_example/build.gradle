@@ -35,8 +35,8 @@ dependencies {
     //implementation project(':librootjava')
 
     /* Use local Maven repository version, installed by installMavenLocal Gradle task */
-    //implementation('eu.chainfire:librootjava:1.3.2-SNAPSHOT') { changing = true }
+    //implementation('eu.chainfire:librootjava:1.3.3-SNAPSHOT') { changing = true }
 
     /* Use jitpack version */
-    implementation 'eu.chainfire:librootjava:1.3.2'
+    implementation 'eu.chainfire:librootjava:1.3.3'
 }
